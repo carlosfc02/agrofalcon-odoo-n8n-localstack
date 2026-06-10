@@ -28,6 +28,7 @@ This project simulates a small agricultural company that:
 - send events to `SQS`,
 - store documents in `S3`,
 - keep the full project reproducible from source control.
+- send a Telegram message when a new lead is created
 
 ## Local Services
 
@@ -82,11 +83,3 @@ It extends CRM leads with a few fields that are useful for this project:
 - external event status
 - S3 document key
 
-To install it:
-
-1. Restart Odoo after pulling changes.
-2. Enable developer mode in Odoo.
-3. Open `Apps`.
-4. Click `Update Apps List`.
-5. Search for `Agrofalcon CRM`.
-6. Install the module.
