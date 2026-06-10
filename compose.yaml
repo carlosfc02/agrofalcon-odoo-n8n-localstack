@@ -1,0 +1,77 @@
+services:
+  db:
+    image: postgres:${POSTGRES_VERSION}
+    container_name: agrofalcon-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  odoo:
+    image: odoo:${ODOO_VERSION}
+    container_name: agrofalcon-odoo
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8069:8069"
+    environment:
+      HOST: db
+      PORT: 5432
+      USER: ${POSTGRES_USER}
+      PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - odoo_data:/var/lib/odoo
+      - ./odoo/addons:/mnt/extra-addons
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:${N8N_VERSION}
+    container_name: agrofalcon-n8n
+    restart: unless-stopped
+    ports:
+      - "${N8N_PORT}:5678"
+    environment:
+      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: "true"
+      N8N_PORT: 5678
+      N8N_HOST: localhost
+      N8N_PROTOCOL: http
+      WEBHOOK_URL: http://localhost:${N8N_PORT}/
+      GENERIC_TIMEZONE: ${GENERIC_TIMEZONE}
+      TZ: ${GENERIC_TIMEZONE}
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n/local-files:/files
+
+  localstack:
+    image: ${LOCALSTACK_IMAGE}
+    container_name: agrofalcon-localstack
+    restart: unless-stopped
+    ports:
+      - "4566:4566"
+      - "4510-4559:4510-4559"
+    environment:
+      LOCALSTACK_AUTH_TOKEN: ${LOCALSTACK_AUTH_TOKEN}
+      DEBUG: 1
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      SERVICES: s3,sqs
+      SQS_ENDPOINT_STRATEGY: path
+    volumes:
+      - ./localstack/volume:/var/lib/localstack
+      - ./localstack/init:/etc/localstack/init
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  postgres_data:
+  odoo_data:
+  n8n_data:

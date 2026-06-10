@@ -1,0 +1,13 @@
+.env*
+.env
+.DS_Store
+
+# Odoo
+odoo/data/
+
+# n8n
+n8n/data/
+
+# LocalStack
+localstack/volume/
+
