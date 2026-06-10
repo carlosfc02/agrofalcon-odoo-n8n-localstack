@@ -43,8 +43,8 @@ def main() -> None:
     s3_client = session.client("s3", endpoint_url=endpoint_url)
     sqs_client = session.client("sqs", endpoint_url=endpoint_url)
 
-    ensure_bucket(s3_client, "agrofalcon-facturas")
-    ensure_bucket(s3_client, "agrofalcon-pedidos")
+    ensure_bucket(s3_client, "agrofalcon.facturas")
+    ensure_bucket(s3_client, "agrofalcon.pedidos")
 
     ensure_queue(sqs_client, "new-leads")
     ensure_queue(sqs_client, "orders")

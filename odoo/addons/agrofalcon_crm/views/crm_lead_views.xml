@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_crm_lead_form_agrofalcon" model="ir.ui.view">
+        <field name="name">crm.lead.form.agrofalcon</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group" position="inside">
+                <group string="Agrofalcon">
+                    <field name="customer_type"/>
+                    <field name="crop_interest"/>
+                    <field name="expected_order_volume_kg"/>
+                    <field name="external_event_status"/>
+                    <field name="s3_document_key"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -43,14 +43,19 @@ The initialization script creates:
 
 ### S3 buckets
 
-- `agrofalcon-facturas`
-- `agrofalcon-pedidos`
+- `agrofalcon.facturas`
+- `agrofalcon.pedidos`
 
 ### SQS queues
 
 - `new-leads`
 - `orders`
 - `invoices`
+
+For the current `n8n` AWS S3 node, the dotted bucket names are the safest option to use with a custom LocalStack S3 endpoint:
+
+- `agrofalcon.facturas`
+- `agrofalcon.pedidos`
 
 ## Repository Structure
 
@@ -63,4 +68,25 @@ odoo/addons/
 README.md
 ```
 
+## Custom Odoo Addon
 
+The repository includes a starter addon:
+
+- `odoo/addons/agrofalcon_crm`
+
+It extends CRM leads with a few fields that are useful for this project:
+
+- customer type
+- crop interest
+- expected order volume
+- external event status
+- S3 document key
+
+To install it:
+
+1. Restart Odoo after pulling changes.
+2. Enable developer mode in Odoo.
+3. Open `Apps`.
+4. Click `Update Apps List`.
+5. Search for `Agrofalcon CRM`.
+6. Install the module.

@@ -1,0 +1,2966 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -656,
+        -32
+      ],
+      "id": "ae07ef53-7f7d-4f21-8736-01ca4e5e2566",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "751f0ca2-f289-4683-82ae-5a079185bfbc",
+              "name": "customer_name",
+              "value": "Quintero",
+              "type": "string"
+            },
+            {
+              "id": "4c10d280-02d3-4d69-a743-c767e0d56974",
+              "name": "email",
+              "value": "quintero@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "2ed1c6d9-c3e0-4692-9dda-f84906765190",
+              "name": "phone",
+              "value": "622178464",
+              "type": "string"
+            },
+            {
+              "id": "f363698d-12bc-460e-898d-ccf47bf5b118",
+              "name": "interest",
+              "value": "Aguacate",
+              "type": "string"
+            },
+            {
+              "id": "5abb0202-8a16-41e9-9a50-83b27d13bf93",
+              "name": "customer_type",
+              "value": "shop",
+              "type": "string"
+            },
+            {
+              "id": "ab3ba525-cc5c-45f9-9573-405878dd8bbd",
+              "name": "crop_interest",
+              "value": "Aguacate",
+              "type": "string"
+            },
+            {
+              "id": "f03ea636-2c5b-4811-91e3-11bab38c9b2a",
+              "name": "expected_order_volume_kg",
+              "value": 30,
+              "type": "number"
+            },
+            {
+              "id": "e8687ed0-861a-4888-86b5-8f810cd10bce",
+              "name": "s3_document_key",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -304,
+        -48
+      ],
+      "id": "b650117a-6fc1-494b-a792-d8732e776261",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "queue": "http://localhost.localstack.cloud:4566/queue/eu-west-1/000000000000/new-leads",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.awsSqs",
+      "typeVersion": 1,
+      "position": [
+        592,
+        112
+      ],
+      "id": "4995c049-6d9e-4468-92ae-35ca593ff4b0",
+      "name": "AWS SQS",
+      "credentials": {
+        "aws": {
+          "id": "M0F5LUTZiEiByQjP",
+          "name": "AWS (IAM) account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        112,
+        32
+      ],
+      "id": "5e3f04b6-3a0e-4332-ac86-6a7b4e99da37",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "authentication": "odooApi",
+        "resource": "opportunity",
+        "operation": "create",
+        "fieldsToSend": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{$json.customer_name}} - {{$json.interest}}",
+            "email_from": "={{ $json.email }}",
+            "phone": "={{ $json.phone }}",
+            "customer_type": "={{ $json.customer_type }}",
+            "crop_interest": "={{ $json.crop_interest }}",
+            "expected_order_volume_kg": "={{ $json.expected_order_volume_kg }}",
+            "external_event_status": "={{ $json.external_event_status }}",
+            "s3_document_key": "={{ $json.s3_document_key }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message_needaction",
+              "displayName": "Action Needed",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "active",
+              "displayName": "Active",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "activity_ids",
+              "displayName": "Activities",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "activity_exception_decoration",
+              "displayName": "Activity Exception Decoration",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Alert",
+                  "value": "warning"
+                },
+                {
+                  "name": "Error",
+                  "value": "danger"
+                }
+              ]
+            },
+            {
+              "id": "activity_state",
+              "displayName": "Activity State",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Overdue",
+                  "value": "overdue"
+                },
+                {
+                  "name": "Today",
+                  "value": "today"
+                },
+                {
+                  "name": "Planned",
+                  "value": "planned"
+                }
+              ]
+            },
+            {
+              "id": "activity_type_icon",
+              "displayName": "Activity Type Icon",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "show_enrich_button",
+              "displayName": "Allow manual enrich",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "date_open",
+              "displayName": "Assignment Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "message_attachment_count",
+              "displayName": "Attachment Count",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "automated_probability",
+              "displayName": "Automated Probability",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "is_blacklisted",
+              "displayName": "Blacklist",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "mobile_blacklisted",
+              "displayName": "Blacklisted Phone Is Mobile",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "phone_blacklisted",
+              "displayName": "Blacklisted Phone is Phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "message_bounce",
+              "displayName": "Bounce",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "campaign_id",
+              "displayName": "Campaign",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "city",
+              "displayName": "City",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "date_closed",
+              "displayName": "Closed Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "color",
+              "displayName": "Color Index",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "company_id",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "partner_name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "contact_name",
+              "displayName": "Contact Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "date_conversion",
+              "displayName": "Conversion Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "country_id",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "create_uid",
+              "displayName": "Created by",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "create_date",
+              "displayName": "Created on",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "crop_interest",
+              "displayName": "Crop Interest",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": false,
+              "type": "string"
+            },
+            {
+              "id": "company_currency",
+              "displayName": "Currency",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "partner_id",
+              "displayName": "Customer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "customer_type",
+              "displayName": "Customer Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": false,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Restaurant",
+                  "value": "restaurant"
+                },
+                {
+                  "name": "Shop",
+                  "value": "shop"
+                },
+                {
+                  "name": "Wholesaler",
+                  "value": "wholesaler"
+                }
+              ]
+            },
+            {
+              "id": "day_open",
+              "displayName": "Days to Assign",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "day_close",
+              "displayName": "Days to Close",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "display_name",
+              "displayName": "Display Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "email_from",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": false,
+              "type": "string"
+            },
+            {
+              "id": "email_cc",
+              "displayName": "Email cc",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "email_domain_criterion",
+              "displayName": "Email Domain Criterion",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "email_state",
+              "displayName": "Email Quality",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Correct",
+                  "value": "correct"
+                },
+                {
+                  "name": "Incorrect",
+                  "value": "incorrect"
+                }
+              ]
+            },
+            {
+              "id": "iap_enrich_done",
+              "displayName": "Enrichment done",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "date_deadline",
+              "displayName": "Expected Closing",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "recurring_revenue_monthly",
+              "displayName": "Expected MRR",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "expected_order_volume_kg",
+              "displayName": "Expected Order Volume (kg)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": false,
+              "type": "number"
+            },
+            {
+              "id": "expected_revenue",
+              "displayName": "Expected Revenue",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "external_event_status",
+              "displayName": "External Event Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": false,
+              "type": "string"
+            },
+            {
+              "id": "message_follower_ids",
+              "displayName": "Followers",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "message_partner_ids",
+              "displayName": "Followers (Partners)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "has_message",
+              "displayName": "Has Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "activity_exception_icon",
+              "displayName": "Icon",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "id",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "is_automated_probability",
+              "displayName": "Is automated probability?",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "message_is_follower",
+              "displayName": "Is Follower",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "is_partner_visible",
+              "displayName": "Is Partner Visible",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "function",
+              "displayName": "Job Position",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "lang_active_count",
+              "displayName": "Lang Active Count",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "lang_id",
+              "displayName": "Language",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "date_automation_last",
+              "displayName": "Last Action",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "date_last_stage_update",
+              "displayName": "Last Stage Update",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "write_uid",
+              "displayName": "Last Updated by",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "write_date",
+              "displayName": "Last Updated on",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "lead_mining_request_id",
+              "displayName": "Lead Mining Request",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "lang_code",
+              "displayName": "Locale Code",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "lost_reason_id",
+              "displayName": "Lost Reason",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "medium_id",
+              "displayName": "Medium",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "meeting_display_date",
+              "displayName": "Meeting Display Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "meeting_display_label",
+              "displayName": "Meeting Display Label",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "calendar_event_ids",
+              "displayName": "Meetings",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "message_has_error",
+              "displayName": "Message Delivery error",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "message_ids",
+              "displayName": "Messages",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "mobile",
+              "displayName": "Mobile",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "my_activity_date_deadline",
+              "displayName": "My Activity Deadline",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "activity_calendar_event_id",
+              "displayName": "Next Activity Calendar Event",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "activity_date_deadline",
+              "displayName": "Next Activity Deadline",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "activity_summary",
+              "displayName": "Next Activity Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "activity_type_id",
+              "displayName": "Next Activity Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "email_normalized",
+              "displayName": "Normalized Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "description",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "message_needaction_counter",
+              "displayName": "Number of Actions",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "message_has_error_counter",
+              "displayName": "Number of errors",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "quotation_count",
+              "displayName": "Number of Quotations",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "sale_order_count",
+              "displayName": "Number of Sale Orders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "name",
+              "displayName": "Opportunity",
+              "required": true,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": false,
+              "type": "string"
+            },
+            {
+              "id": "order_ids",
+              "displayName": "Orders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "partner_email_update",
+              "displayName": "Partner Email will Update",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "partner_is_blacklisted",
+              "displayName": "Partner is blacklisted",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "partner_phone_update",
+              "displayName": "Partner Phone will Update",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": false,
+              "type": "string"
+            },
+            {
+              "id": "phone_sanitized_blacklisted",
+              "displayName": "Phone Blacklisted",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "phone_state",
+              "displayName": "Phone Quality",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Correct",
+                  "value": "correct"
+                },
+                {
+                  "name": "Incorrect",
+                  "value": "incorrect"
+                }
+              ]
+            },
+            {
+              "id": "phone_mobile_search",
+              "displayName": "Phone/Mobile",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "duplicate_lead_ids",
+              "displayName": "Potential Duplicate Lead",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "duplicate_lead_count",
+              "displayName": "Potential Duplicate Lead Count",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Low",
+                  "value": "0"
+                },
+                {
+                  "name": "Medium",
+                  "value": "1"
+                },
+                {
+                  "name": "High",
+                  "value": "2"
+                },
+                {
+                  "name": "Very High",
+                  "value": "3"
+                }
+              ]
+            },
+            {
+              "id": "probability",
+              "displayName": "Probability",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "lead_properties",
+              "displayName": "Properties",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "recurring_revenue_monthly_prorated",
+              "displayName": "Prorated MRR",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "recurring_revenue_prorated",
+              "displayName": "Prorated Recurring Revenues",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "prorated_revenue",
+              "displayName": "Prorated Revenue",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "recurring_plan",
+              "displayName": "Recurring Plan",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "recurring_revenue",
+              "displayName": "Recurring Revenues",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "referred",
+              "displayName": "Referred By",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "activity_user_id",
+              "displayName": "Responsible User",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "reveal_id",
+              "displayName": "Reveal ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "s3_document_key",
+              "displayName": "S3 Document Key",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": false,
+              "type": "string"
+            },
+            {
+              "id": "team_id",
+              "displayName": "Sales Team",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "user_id",
+              "displayName": "Salesperson",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "phone_sanitized",
+              "displayName": "Sanitized Number",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "message_has_sms_error",
+              "displayName": "SMS Delivery error",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "source_id",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "stage_id",
+              "displayName": "Stage",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "state_id",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "duration_tracking",
+              "displayName": "Status time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "street",
+              "displayName": "Street",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "street2",
+              "displayName": "Street2",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "sale_amount_total",
+              "displayName": "Sum of Orders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "tag_ids",
+              "displayName": "Tags",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Lead",
+                  "value": "lead"
+                },
+                {
+                  "name": "Opportunity",
+                  "value": "opportunity"
+                }
+              ]
+            },
+            {
+              "id": "user_company_ids",
+              "displayName": "User Company",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "website_message_ids",
+              "displayName": "Website Messages",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "zip",
+              "displayName": "Zip",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "n8n-nodes-base.odoo",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        -304
+      ],
+      "id": "48585e20-b5d3-4869-8a2f-fdb3f5db9a4b",
+      "name": "Create an opportunity1",
+      "credentials": {
+        "odooApi": {
+          "id": "yQChSWqRFrGbNJO8",
+          "name": "Odoo account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "agrofalcon.pedidos",
+        "fileName": "={{ $json.s3_file_name }}",
+        "binaryData": false,
+        "fileContent": "={{ JSON.stringify($json, null, 2) }}",
+        "additionalFields": {
+          "parentFolderKey": "leads"
+        },
+        "tagsUi": {
+          "tagsValues": []
+        }
+      },
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        688,
+        -128
+      ],
+      "id": "ab55ccc3-42a0-48c9-b636-fbb20f9cd917",
+      "name": "Upload a file",
+      "credentials": {
+        "aws": {
+          "id": "M0F5LUTZiEiByQjP",
+          "name": "AWS (IAM) account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "07c1572d-d534-4fa8-8254-ed6e4b535cb9",
+              "name": "s3_file_name",
+              "value": "={{ ($json.customer_name || 'lead').replace(/\\s+/g, '-').toLowerCase() + '-' + ($json.id || 'no-id') + '-' + ($now.format('yyyyMMdd_HHmmss')) + '.json' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        288,
+        -304
+      ],
+      "id": "ab3861da-bce5-419f-a18f-8ea9f6c7c8de",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "authentication": "odooApi",
+        "resource": "opportunity",
+        "operation": "update",
+        "opportunityId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "fieldsToSend": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "s3_document_key": "=leads/{{ $json.s3_file_name }}",
+            "external_event_status": "stored_in_s3"
+          },
+          "matchingColumns": [
+            "s3_document_key"
+          ],
+          "schema": [
+            {
+              "id": "message_needaction",
+              "displayName": "Action Needed",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "active",
+              "displayName": "Active",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "activity_ids",
+              "displayName": "Activities",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "activity_exception_decoration",
+              "displayName": "Activity Exception Decoration",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Alert",
+                  "value": "warning"
+                },
+                {
+                  "name": "Error",
+                  "value": "danger"
+                }
+              ]
+            },
+            {
+              "id": "activity_state",
+              "displayName": "Activity State",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Overdue",
+                  "value": "overdue"
+                },
+                {
+                  "name": "Today",
+                  "value": "today"
+                },
+                {
+                  "name": "Planned",
+                  "value": "planned"
+                }
+              ]
+            },
+            {
+              "id": "activity_type_icon",
+              "displayName": "Activity Type Icon",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "show_enrich_button",
+              "displayName": "Allow manual enrich",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "date_open",
+              "displayName": "Assignment Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "message_attachment_count",
+              "displayName": "Attachment Count",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "automated_probability",
+              "displayName": "Automated Probability",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "is_blacklisted",
+              "displayName": "Blacklist",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "mobile_blacklisted",
+              "displayName": "Blacklisted Phone Is Mobile",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "phone_blacklisted",
+              "displayName": "Blacklisted Phone is Phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "message_bounce",
+              "displayName": "Bounce",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "campaign_id",
+              "displayName": "Campaign",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "city",
+              "displayName": "City",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "date_closed",
+              "displayName": "Closed Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "color",
+              "displayName": "Color Index",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "company_id",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "partner_name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "contact_name",
+              "displayName": "Contact Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "date_conversion",
+              "displayName": "Conversion Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "country_id",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "create_uid",
+              "displayName": "Created by",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "create_date",
+              "displayName": "Created on",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "crop_interest",
+              "displayName": "Crop Interest",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "company_currency",
+              "displayName": "Currency",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "partner_id",
+              "displayName": "Customer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "customer_type",
+              "displayName": "Customer Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Restaurant",
+                  "value": "restaurant"
+                },
+                {
+                  "name": "Shop",
+                  "value": "shop"
+                },
+                {
+                  "name": "Wholesaler",
+                  "value": "wholesaler"
+                }
+              ]
+            },
+            {
+              "id": "day_open",
+              "displayName": "Days to Assign",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "day_close",
+              "displayName": "Days to Close",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "display_name",
+              "displayName": "Display Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "email_from",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "email_cc",
+              "displayName": "Email cc",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "email_domain_criterion",
+              "displayName": "Email Domain Criterion",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "email_state",
+              "displayName": "Email Quality",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Correct",
+                  "value": "correct"
+                },
+                {
+                  "name": "Incorrect",
+                  "value": "incorrect"
+                }
+              ]
+            },
+            {
+              "id": "iap_enrich_done",
+              "displayName": "Enrichment done",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "date_deadline",
+              "displayName": "Expected Closing",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "recurring_revenue_monthly",
+              "displayName": "Expected MRR",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "expected_order_volume_kg",
+              "displayName": "Expected Order Volume (kg)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "expected_revenue",
+              "displayName": "Expected Revenue",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "external_event_status",
+              "displayName": "External Event Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": false,
+              "type": "string"
+            },
+            {
+              "id": "message_follower_ids",
+              "displayName": "Followers",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "message_partner_ids",
+              "displayName": "Followers (Partners)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "has_message",
+              "displayName": "Has Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "activity_exception_icon",
+              "displayName": "Icon",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "id",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "is_automated_probability",
+              "displayName": "Is automated probability?",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "message_is_follower",
+              "displayName": "Is Follower",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "is_partner_visible",
+              "displayName": "Is Partner Visible",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "function",
+              "displayName": "Job Position",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "lang_active_count",
+              "displayName": "Lang Active Count",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "lang_id",
+              "displayName": "Language",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "date_automation_last",
+              "displayName": "Last Action",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "date_last_stage_update",
+              "displayName": "Last Stage Update",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "write_uid",
+              "displayName": "Last Updated by",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "write_date",
+              "displayName": "Last Updated on",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "lead_mining_request_id",
+              "displayName": "Lead Mining Request",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "lang_code",
+              "displayName": "Locale Code",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "lost_reason_id",
+              "displayName": "Lost Reason",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "medium_id",
+              "displayName": "Medium",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "meeting_display_date",
+              "displayName": "Meeting Display Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "meeting_display_label",
+              "displayName": "Meeting Display Label",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "calendar_event_ids",
+              "displayName": "Meetings",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "message_has_error",
+              "displayName": "Message Delivery error",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "message_ids",
+              "displayName": "Messages",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "mobile",
+              "displayName": "Mobile",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "my_activity_date_deadline",
+              "displayName": "My Activity Deadline",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "activity_calendar_event_id",
+              "displayName": "Next Activity Calendar Event",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "activity_date_deadline",
+              "displayName": "Next Activity Deadline",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "dateTime"
+            },
+            {
+              "id": "activity_summary",
+              "displayName": "Next Activity Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "activity_type_id",
+              "displayName": "Next Activity Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "email_normalized",
+              "displayName": "Normalized Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "description",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "message_needaction_counter",
+              "displayName": "Number of Actions",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "message_has_error_counter",
+              "displayName": "Number of errors",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "quotation_count",
+              "displayName": "Number of Quotations",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "sale_order_count",
+              "displayName": "Number of Sale Orders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "name",
+              "displayName": "Opportunity",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "order_ids",
+              "displayName": "Orders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "partner_email_update",
+              "displayName": "Partner Email will Update",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "partner_is_blacklisted",
+              "displayName": "Partner is blacklisted",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "partner_phone_update",
+              "displayName": "Partner Phone will Update",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "phone_sanitized_blacklisted",
+              "displayName": "Phone Blacklisted",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "phone_state",
+              "displayName": "Phone Quality",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Correct",
+                  "value": "correct"
+                },
+                {
+                  "name": "Incorrect",
+                  "value": "incorrect"
+                }
+              ]
+            },
+            {
+              "id": "phone_mobile_search",
+              "displayName": "Phone/Mobile",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "duplicate_lead_ids",
+              "displayName": "Potential Duplicate Lead",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "duplicate_lead_count",
+              "displayName": "Potential Duplicate Lead Count",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Low",
+                  "value": "0"
+                },
+                {
+                  "name": "Medium",
+                  "value": "1"
+                },
+                {
+                  "name": "High",
+                  "value": "2"
+                },
+                {
+                  "name": "Very High",
+                  "value": "3"
+                }
+              ]
+            },
+            {
+              "id": "probability",
+              "displayName": "Probability",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "lead_properties",
+              "displayName": "Properties",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "recurring_revenue_monthly_prorated",
+              "displayName": "Prorated MRR",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "recurring_revenue_prorated",
+              "displayName": "Prorated Recurring Revenues",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "prorated_revenue",
+              "displayName": "Prorated Revenue",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "recurring_plan",
+              "displayName": "Recurring Plan",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "recurring_revenue",
+              "displayName": "Recurring Revenues",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "referred",
+              "displayName": "Referred By",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "activity_user_id",
+              "displayName": "Responsible User",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "reveal_id",
+              "displayName": "Reveal ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "s3_document_key",
+              "displayName": "S3 Document Key",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": false,
+              "type": "string"
+            },
+            {
+              "id": "team_id",
+              "displayName": "Sales Team",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "user_id",
+              "displayName": "Salesperson",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "phone_sanitized",
+              "displayName": "Sanitized Number",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "message_has_sms_error",
+              "displayName": "SMS Delivery error",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "boolean"
+            },
+            {
+              "id": "source_id",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "stage_id",
+              "displayName": "Stage",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "state_id",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "duration_tracking",
+              "displayName": "Status time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "street",
+              "displayName": "Street",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "street2",
+              "displayName": "Street2",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "sale_amount_total",
+              "displayName": "Sum of Orders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "number"
+            },
+            {
+              "id": "tag_ids",
+              "displayName": "Tags",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Lead",
+                  "value": "lead"
+                },
+                {
+                  "name": "Opportunity",
+                  "value": "opportunity"
+                }
+              ]
+            },
+            {
+              "id": "user_company_ids",
+              "displayName": "User Company",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            },
+            {
+              "id": "website_message_ids",
+              "displayName": "Website Messages",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": false,
+              "removed": true,
+              "type": "array"
+            },
+            {
+              "id": "zip",
+              "displayName": "Zip",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "removed": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "n8n-nodes-base.odoo",
+      "typeVersion": 2,
+      "position": [
+        848,
+        -368
+      ],
+      "id": "bccf9b55-a484-42f9-9398-a7508da371b4",
+      "name": "Update an opportunity",
+      "credentials": {
+        "odooApi": {
+          "id": "yQChSWqRFrGbNJO8",
+          "name": "Odoo account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "2067552292",
+        "text": "=Agrofalcon lead created\n\nID: {{$json.id}}\nCustomer: {{$json.customer_name}}\nInterest: {{$json.crop_interest}}\nVolume: {{$json.expected_order_volume_kg}} kg\nS3 key: leads/{{$json.s3_file_name}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1216,
+        -352
+      ],
+      "id": "a1ffe946-505d-44e8-aa50-9fb63ec022c5",
+      "name": "Send a text message",
+      "webhookId": "7653d7c0-98fe-4955-9cee-557fcc27bb95",
+      "credentials": {
+        "telegramApi": {
+          "id": "zLnW4Lmsr0GP8Ab4",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1024,
+        -544
+      ],
+      "id": "87e5ad9f-a1b9-43e9-992d-6bdb59f8e401",
+      "name": "Merge1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Create an opportunity1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "AWS SQS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an opportunity1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Upload a file",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update an opportunity",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload a file": {
+      "main": [
+        [
+          {
+            "node": "Update an opportunity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update an opportunity": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "aadce799-514a-4b1d-9983-e31516d74809",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bd8c50699ae9ed847a35a6dcd25678749a7e59a41f0611f3a3192c75ae967696"
+  },
+  "nodeGroups": [],
+  "id": "fE0m5fb01UGaQLPq",
+  "tags": []
+}
